@@ -1,0 +1,125 @@
+---
+title: "Erste_Uebung"
+author: "Tim Breitenbach"
+output: html_document
+---
+
+# Aufgabe 2 
+
+Laden sie den Datensatz mtcars aud dem Paket datasets:
+
+```{r}
+mtcars <- mtcars
+```
+
+Berechnen Sie fur die Variable Hubraum ( ¨ disp) den Mittelwert, die Standardabweichung, den Median, die Quartile, das Minimum, das Maximum und den IQR
+
+```{r}
+cat("Standardabweichung ist:", sd(mtcars$disp), "\n")
+cat("Mittelwert ist:", mean(mtcars$disp), "\n")
+cat("Median ist:", median(mtcars$disp), "\n")
+cat("Minimum ist:", min(mtcars$disp), "\n")
+cat("Maximum ist:", max(mtcars$disp), "\n")
+cat("Quantile sind (0, 0.25, 0.5, 0.75, 1): \n", quantile(mtcars$disp), "\n")
+cat("IQR ist:", IQR(mtcars$disp), "\n")
+```
+Wandeln Sie die Variable cyl in einen Faktor um und erstellen Sie eine Häufigkeitstabelle fur die Zylinderanzahl.
+
+```{r}
+mtcars$cyl <- as.factor(mtcars$cyl)
+summary(mtcars$cyl)
+```
+Berechnen Sie noch einmal die Kennzahlen aus Teilaufgabe (b), diesmal jedoch
+getrennt nach Zylinderanzahl.
+```{r}
+aggregate(disp ~ cyl, mtcars, mean)
+aggregate(disp ~ cyl, mtcars, sd)
+aggregate(disp ~ cyl, mtcars, median)
+aggregate(disp ~ cyl, mtcars, min)
+aggregate(disp ~ cyl, mtcars, max)
+aggregate(disp ~ cyl, mtcars, quantile)
+aggregate(disp ~ cyl, mtcars, IQR)
+```
+# Aufgabe 3
+Die Datei hand.csv enth¨alt Daten aus einer Querschnittstudie, in der von 2209 USAmerikanern im Alter zwischen 25 und 34 Jahren die Variablen Geschlecht und H¨andigkeit (rechtsh¨andig/linksh¨andig) erhoben wurden. Im Datensatz heisst die Variable
+H¨andigkeit hand und ist mit links/rechts codiert. Die Variable Geschlecht ist mit 0
+= m¨annlich und 1 = weiblich codiert.
+(a) Importieren Sie die Daten mit dem R Commander.
+
+
+```{r setup, include=FALSE}
+hand <- read.csv('hand.csv', sep = ";")
+```
+(b) Wandeln Sie die Variablen falls nötig in einen Faktor um.
+(c) Stellen Sie die Daten in einer Kreuztabelle dar.
+
+```{r}
+hand$hand <- as.factor(hand$hand)
+hand$geschlecht <- as.factor(hand$geschlecht)
+table(hand)
+```
+
+Aufgabe 4
+
+Ein klassischer Beispieldatensatz in der Statistik sind Fisher’s Schwertlilien-Messungen:
+Von je 50 Pflanzen dreier Arten sind die L¨ange und die Breite der Kelchbl¨atter (sepal
+length/width) sowie der Blutenbl ¨ ¨atter (petal length/width) bekannt. Die Idee hinter der
+Vermessung der Bl¨atter war, dass man die drei Pflanzenarten vielleicht anhand dieser
+einfachen Kriterien unterscheiden k¨onnte. Die entsprechenden statistischen Verfahren
+werden sp¨ater im Kurs im Modul ”
+Einfuhrung in die Klassifikation“ vorgestellt. Vorl ¨ ¨aufig
+beschr¨anken wir uns auf grafische Darstellungen.
+(a) Laden Sie den Datensatz iris aus dem Paket datasets mit dem R Commander.
+
+```{r}
+iris <- iris
+summary(iris)
+```
+
+(b) Erzeugen Sie eine Scatterplot-Matrix, in der die vier Messungen gegeneinander aufgezeichnet sind. Dabei sollen fur die verschiedenen Arten unterschiedliche Symbole ¨
+verwendet werden. Was f¨allt auf?
+
+```{r}
+library(ggplot2)
+
+pairs(iris[1:4], main = "Iris Data", pch = 21, bg = c("red", "green3", "blue")[unclass(iris$Species)])
+```
+
+Antwort:
+
+Es sind bei den meisten Scatterplots klare Cluster zu sehen.
+
+(c) Erzeugen Sie eine dreidimensionale Punktewolke mit drei der vier Variablen. (Welche Variablen w¨ahlen Sie dazu?) Drehen Sie die Punktewolke, um eine Perspektive
+zu finden, in der sich die Gruppen m¨oglichst gut unterscheiden lassen.
+Hinweis: Sie finden die ben¨otigte Option unter Graphs I 3D graph I 3D scatterplot. . . .
+
+```{r}
+sep.l <- iris$Sepal.Length
+sep.w <- iris$Sepal.Width
+pet.l <- iris$Petal.Length
+
+scatter3d(sep.l, sep.w, pet.l, surface = FALSE, groups = iris$Species)
+```
+
+(d) Untersuchen Sie zum Vergleich die Aussagekraft der einzelnen Variablen mit Boxplots.
+
+```{r}
+library(ggplot2)
+ggplot(iris, aes(x=Species, y=Sepal.Length)) + 
+  geom_boxplot() +
+  theme_dark()
+
+ggplot(iris, aes(x=Species, y=Sepal.Width)) + 
+  geom_boxplot() +
+  theme_dark()
+
+ggplot(iris, aes(x=Species, y=Petal.Length)) + 
+  geom_boxplot() +
+  theme_dark()
+
+ggplot(iris, aes(x=Species, y=Petal.Width)) + 
+  geom_boxplot() +
+  theme_dark()
+
+```
+
