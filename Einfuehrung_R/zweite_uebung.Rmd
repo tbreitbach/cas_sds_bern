@@ -1,0 +1,175 @@
+---
+title: "zweite_uebung"
+author: "Tim Breitenbach"
+date: "6 11 2020"
+output: html_document
+---
+
+# Aufgabe 1
+
+Geben Sie in R die Daten zu den Hufschlag-Todesf¨allen pro Korps und Jahr in
+der preussischen Armee (vgl. Beispiel 6.1 im Skript ”
+Deskriptive Statistik und
+Wahrscheinlichkeitsrechnung“) ein.
+Tipp: Erzeugen Sie einen Vektor mit der Anzahl Todesf¨alle und einen Vektor mit
+den absoluten H¨aufigkeiten.
+Anzahl Todesf¨alle abs. H¨aufigkeit
+0 109
+1 65
+2 22
+3 3
+4 1
+Die nicht vorgekommenen Todesfall-Anzahlen uber 4 ben ¨ ¨otigen wir hier nicht.
+
+
+```{r}
+data = data.frame(anzahl_tod = c(0,1,2,3,4), absHaeufig = c(109,65,22,3,1))
+data
+```
+
+Berechnen Sie die relativen H¨aufigkeiten (die Gesamtzahl von 200 Beobachtungen
+k¨onnen Sie als bekannt voraussetzen).
+
+```{r}
+library(dplyr)
+data = data %>%
+  mutate(relHaeufig = absHaeufig / 200)
+
+data
+```
+
+Berechnen Sie die mittlere Anzahl Todesf¨alle pro Korps und Jahr.
+Tipp: Mit der Funktion sum k¨onnen die Komponenten eines Vektors aufsummiert
+werden.
+
+
+```{r}
+ sum(data$anzahl_tod*data$relHaeufig)
+```
+
+ Erzeugen Sie einen Vektor mit den entsprechenden Wahrscheinlichkeiten der Poissonverteilung mit λ = 0.61
+ 
+```{r}
+data = data %>%
+  mutate(poisson = dpois(anzahl_tod, 0.61))
+
+data
+```
+ 
+# Aufgabe 2
+
+Gegeben sind die zwei Vektoren ~a = (3, −2, 0) und ~b = (2, 1, 2).
+```{r}
+a = c(3, -2, 0)
+b = c(2, 1, 2)
+```
+(a) ~a +~b,
+
+```{r}
+a + b
+```
+(b) 7 · ~a,
+
+```{r}
+7 * a
+```
+
+(c) das Skalarprodukt ~a · ~b
+
+```{r}
+a %*% b
+```
+
+(d) max(a,b),
+
+```{r}
+
+max(a,b)
+
+```
+
+(e) pmax(a,b). Was ist der Unterschied zu (d)?
+```{r}
+pmax(a, b)
+```
+max gibt grösste Zahl in beiden Vektoren, pmax gibt grössten Vektor
+
+(f) Erzeugen Sie nun folgende Matrix in R:
+A =
+
+4 7 2
+9 5 2
+
+
+```{r}
+matrixdata = c(4,7,2,9,5,2)
+A = matrix(matrixdata, nrow=2, ncol=3, byrow=TRUE)
+A
+```
+(g) Berechnen Sie A~b.
+
+```{r}
+A %*% b
+```
+
+
+# Aufgabe 3
+
+(a) Schreiben Sie eine Funktion, die Meilen in km umrechnet. 1 Meile entspricht 1.6093
+km.
+
+```{r}
+milestokm = function(miles){
+  miles * 1.6093
+}
+
+milestokm(15)
+```
+
+(b) Schreiben Sie eine Funktion, die Gallonen in Liter umrechnet. 1 Gallone entspricht
+3.7854 l.
+
+
+```{r}
+
+gallonstoliter = function(gallons){
+  gallons * 3.7854
+}
+
+gallonstoliter(12)
+```
+
+(c) Ein bestimmtes Auto habe eine Reichweite von 35 Meilen pro Gallone Benzin.
+Rechnen Sie diesen Wert in den Benzinverbrauch in Litern pro 100 km um.
+
+
+```{r}
+gallonstoliter(1/milestokm(35))*100
+```
+
+(d) Im Datensatz mtcars ist in der Variable mpg die Reichweite in Meilen pro Gallone
+Benzin gegeben. Rechnen Sie diese Werte in den Benzinverbrauch in Litern pro
+100 km um.
+
+```{r}
+gallonstoliter(1/mtcars$mpg)*100
+```
+
+# Aufgabe 4
+
+(a) Schauen Sie sich mit ls() alle Objekte an, die Sie bis jetzt erzeugt haben.
+
+```{r}
+ls()
+
+```
+
+(b) L¨oschen sie mit der Funktion rm die Objekte a und b aus Aufgabe 2.
+
+```{r}
+rm(a)
+rm(b)
+```
+
+
+
