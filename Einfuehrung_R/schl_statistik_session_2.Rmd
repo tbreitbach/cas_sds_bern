@@ -1,0 +1,32 @@
+---
+title: "schl_statistik_aufg_2"
+author: "Tim Breitenbach"
+date: "13 11 2020"
+output: html_document
+---
+# Aufgabe 1
+
+```{r}
+data = data.frame(Jahr = c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2019), Toetungsdelikte = c(18,12,19,18,8,16,15,9,13,11))
+data
+```
+
+(a) Ausgehend von den Daten fur die Jahre 2010–2019, wie ist die Anzahl j ¨ ¨ahrlicher
+T¨otungsdelikte verteilt?
+
+Da Poissonverteilung P(λ) = P(Mean(data$Toetungsdelikte))
+
+```{r}
+mean(data$Toetungsdelikte)
+```
+(b) Welches ist die kleinste Anzahl Delikte, die gem¨ass Modell mit einer Wahrscheinlichkeit von mindestens 95% nicht uberschritten wird? ¨
+Erinnerung: Fur eine Zufallsvariable ¨ X und γ ∈ (0, 1) ist ein γ-Quantil der Verteilungsfunktion von X eine reelle Zahl qγ, fur die gilt: P( ¨ X ≤ qγ) ≥ γ und
+P(X ≥ qγ) ≥ 1 − γ. Falls mehr als eine Zahl die Bedingungen erfullt, gilt oft die ¨
+Konvention, dass die kleinste unter ihnen ausgew¨ahlt wird.
+Hinweis: In R k¨onnen Quantile der Poisson-Verteilung mit Hilfe der Funktion
+qpois bestimmt werden
+
+```{r}
+qpois(0.95, mean(data$Toetungsdelikte))
+```
+ Quantil ist gleich 20

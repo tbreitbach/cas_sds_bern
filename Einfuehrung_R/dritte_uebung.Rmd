@@ -1,0 +1,230 @@
+---
+title: "dritte_uebung"
+author: "Tim Breitenbach"
+date: "13 11 2020"
+output: html_document
+---
+# Aufgabe 1
+
+(a) Berechnen Sie 9! mit Hilfe einer Schleife.
+
+```{r}
+fac <- 1
+for (i in 1:9) {
+fac <- fac*i
+}
+fac
+```
+
+Schreiben Sie eine Funktion mit Namen fakultaet, mit deren Hilfe n! = 1·2·. . .·n
+fur ¨ n ∈ N berechnet werden kann.
+
+```{r}
+fak <- function(n){
+  fac = 1
+  for (i in 1:n){
+    fac = fac*i
+  }
+  fac
+}
+```
+ Berechnen Sie 9! mit Hilfe der in (b) geschriebenen Funktion.
+```{r}
+fak(9)
+```
+
+Erg¨anzen Sie die in (b) geschriebene Funktion so, dass sie zus¨atzlich fur 0! das ¨
+richtige Ergebnis zuruck gibt. ¨
+Was geschieht, wenn Sie diese Funktion mit einem negativen Wert n aufrufen?
+
+```{r}
+fak <- function(n) {
+  if (n == 0) {
+    fac <- 1
+  }
+  else {
+    fac <- 1
+    for (i in 1:n) {
+      fac <- fac * i
+    }
+  }
+  fac
+}
+
+fak(-2)
+```
+
+e) Schreiben Sie eine Funktion mit Namen fakultaet2, mit deren Hilfe ebenfalls
+n! = 1·2·. . .·n berechnet werden kann, aber diesmal nicht mit Hilfe einer Schleife,
+sondern rekursiv.
+Was geschieht diesmal, wenn Sie die Funktion mit einem negativen Wert n aufrufen?
+
+
+```{r}
+
+fak2 = function(n) {
+  if(n<=1) {
+    fac = 1
+  } else {
+    fac = n*fak2(n-1)
+  }
+  fac
+}
+
+fak2(-2)
+```
+
+(f)
+Schreiben Sie eine Funktion mit Namen fakultaet3, die fur jede Komponente ¨
+eines Vektors die entsprechende Fakult¨at berechnet. (Hinweis: Benutzen Sie die
+Funktion sapply und Aufgabenteil (d) oder (e).)
+
+```{r}
+fak3 = function(v){
+  sapply(v, fak2)
+}
+
+```
+
+# Aufgabe 2
+
+(a) Erzeugen Sie mit der Funktion outer eine Matrix S, die als Zeilen die 1er-, 2er,
+. . . , 15er-Reihe enth¨alt, jeweils bis zum 10-fachen. (Die Matrix soll also 15 Zeilen
+und 10 Spalten haben.)
+
+```{r}
+
+s = outer(1:15, 1:10)
+s
+```
+
+(b) Schreiben Sie die Elemente von S in einen Vektor s.
+(Hinweis: Verwenden Sie die Funktion as.vector.) In welcher Reihenfolge werden
+die Elemente der Matrix in den Vektor ubernommen? 
+
+```{r}
+
+S = as.vector(s)
+S
+
+```
+(c) Berechnen Sie die zeilen- und spaltenweisen Mittelwerte von S.
+```{r}
+apply(s, 1, mean)
+apply(s, 2, mean)
+
+```
+
+(d) Berechnen Sie die zeilen- und spaltenweisen Summen aller Zahlen kleiner oder
+gleich 60. (Hinweis: Sie k¨onnen der Funktion apply auch selber definierte Funktionen ubergeben.) 
+
+
+```{r}
+apply(s, 1, function(x){sum(x[x <=60])})
+apply(s, 2, function(x){sum(x[x <=60])})
+
+```
+
+# Aufgabe 3
+
+Betrachten Sie die folgende Funktion:
+```{r}
+trimmed.mean <- function(x, trim = 0) {
+  if (!is.numeric(x) | length(x) < 1) {
+    stop("’x’ must be numeric with length >= 1")
+  }
+  if (sum(is.na(x)) > 0) {
+    stop("’x’ must not contain any missing values")
+  }
+  if (!is.numeric(trim) | length(trim) != 1) {
+    stop("’trim’ must be numeric of length one")
+  }
+  if (trim > 0) {
+    if (trim >= 0.5) {
+      m <- median(x)
+    } else {
+      n <- length(x)
+      lo <- floor(n * trim) + 1
+      hi <- n + 1 - lo
+      x <- sort(x)[lo:hi]
+      m <- mean(x)
+    }
+  } else {
+    m <- mean(x)
+  }
+  m
+}
+```
+
+
+Hinweise: stop() unterbricht die Funktion an der gegebenen Stelle und gibt die angegebene Fehlermeldung zuruck. ¨ median und sort tun das, was ihr Name erwarten l¨asst,
+und sind weiter hinten im Skript beschrieben.
+Interpretieren Sie fur die folgenden Aufgaben den Code selber – lassen Sie ihn also nicht ¨
+einfach von R ausfuhren
+
+
+(a) Was ergibt trimmed.mean(c(1, 6, 2, 7, 1))?
+
+Mittelwert wird berechnet mean(x)
+
+```{r}
+trimmed.mean(c(1, 6, 2, 7, 1))
+
+```
+(b) Was ergibt trimmed.mean(c(1, 6, 2, 7, 1), trim=0.2)?
+es wird getrimmt, 20% von oben und unten, folgender Code wird ausgeführt
+
+n <- length(x)
+      lo <- floor(n * trim) + 1
+      hi <- n + 1 - lo
+      x <- sort(x)[lo:hi]
+      m <- mean(x)
+
+```{r}
+trimmed.mean(c(1, 6, 2, 7, 1), trim=0.2)
+```
+(c) Was ergibt trimmed.mean(c(1, 6, 2, 7, 1), trim=1)?
+Median wird verwendet
+
+```{r}
+trimmed.mean(c(1, 6, 2, 7, 1), trim=1)
+```
+
+(d) Was ergibt trimmed.mean(c(’1’,’2’,’5’))?
+Fehlermeldung erscheint: ’x’ must be numeric with length >= 1, Vektor ist nicht numerisch definiert.
+
+```{r}
+trimmed.mean(c('1','2','5'))
+```
+
+(e*) Fugen Sie sinnvolle Kommentare in den Programmcode ein, welche die einzelnen ¨
+Bl¨ocke des Programmcodes erkl¨aren.
+
+```{r}
+trimmed.mean <- function(x, trim = 0) {
+  if (!is.numeric(x) | length(x) < 1) { # nicht numerische und Vektoren mit Länge 0 werden hier abgefangen
+    stop("’x’ must be numeric with length >= 1")
+  }
+  if (sum(is.na(x)) > 0) { # NA Values im Vektor werden abgefangen
+    stop("’x’ must not contain any missing values")
+  }
+  if (!is.numeric(trim) | length(trim) != 1) { # Stellt sicher das trim Argument numerisch ist und ein einzelner Wert ist
+    stop("’trim’ must be numeric of length one")
+  }
+  if (trim > 0) { # Wenn Trim grösser als 0
+    if (trim >= 0.5) { # Wenn Trimm grösser gleich 0.5(macht kein Sinn)
+      m <- median(x)
+    } else {
+      n <- length(x)
+      lo <- floor(n * trim) + 1
+      hi <- n + 1 - lo
+      x <- sort(x)[lo:hi]
+      m <- mean(x)
+    }
+  } else { #Ansonsten wird Mittelwert ausgerechnet
+    m <- mean(x)
+  }
+  m
+}
+```
+
