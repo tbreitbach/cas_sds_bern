@@ -1,0 +1,186 @@
+---
+title: "vierte_uebung"
+author: "Tim Breitenbach"
+date: "20 11 2020"
+output: html_document
+---
+
+#  Aufgabe 1
+Erstellen Sie einen Datensatz mit 40 Beobachtungen, welcher folgende Variablen beinhaltet:
+id: Beobachtungsnummer (von 1 bis 40).
+
+a: Die ersten vier Beobachtungen sind 1, die zweiten vier 2, usw.
+b: Die erste Beobachtung ist 1.2, die zweite 1.4, usw
+```{r}
+daten <- data.frame(id = 1:40, a = rep(1:10, each=4), b = seq(1.2, 9, 0.2))
+daten
+
+```
+c:
+
+”gerade“ bzw. ”ungerade“, je nach dem Wert von a
+
+
+```{r}
+daten$c <- ifelse(daten$a %% 2 == 0, 'gerade', 'ungerade')
+daten
+```
+
+d:
+”1 ist ungerade“ bzw. ”2 ist gerade“ usw., aus a und c
+
+```{r}
+daten$d <- with(daten, paste(a, 'ist', c))
+daten
+```
+
+e: (etwas schwieriger) ”1.2 ist nicht ganzzahlig“ bzw. ”2 ist ganzzahlig“ usw., je nach dem Wert von b
+
+```{r}
+daten$e <- with(daten, paste(b, 'ist', ifelse(round(b, 0) == round(b, 10), 'ganzzahlig', 'nicht ganzzahlig')))
+daten
+```
+
+# Aufgabe 2
+
+In einem Experiment wurde der Dampfdruck von Quecksilber (in mm Hg) als Funktion der Temperatur (in Grad Celsius) gemessen. Die dazugeh¨origen Daten sind in der
+folgenden Tabelle dargestellt.
+
+Erstellen Sie einen Data Frame obigen Ergebnissen und benennen Sie diesen mit
+Experiment.
+
+```{r}
+Experiment <- data.frame(temp = c(0,60,120,180,240,300,360), pres = c(0.0002,0.03,0.75,8.8,57,247,806))
+Experiment
+```
+
+(b) Fugen Sie dem Data Frame folgende neue Variablen hinzu: ¨
+• Temperatur in Kelvin (Temp.K), wobei TempKelvin = TempCelsius + 273.15,
+• Druck in kPa (Druck.kPa), wobei DruckkPa = 0.133322 · DruckmmHg.
+
+
+```{r}
+library(dplyr)
+
+Experiment <- Experiment %>%
+  mutate(temp_k = temp +273.15) %>%
+  mutate(pres_kpa = pres * 0.133322)
+
+Experiment
+
+
+```
+
+(c) Andern Sie bei der Variable ¨ Druck den Wert 8.8 zu 9.
+
+```{r}
+Experiment$pres[4] = 9
+
+Experiment
+```
+
+(d) Speichern Sie die zweite, vierte und sechste Zeile des Data Frames als neuen Data
+Frame Experiment2 ab.
+
+```{r}
+Experiment2 = Experiment[c(2,4,6), ]
+Experiment2
+```
+
+# Aufgabe 3
+
+Wir verwenden fur diese Aufgabe den Datensatz ¨ StatWiSo2008.txt.
+
+(a) Lesen Sie den Datensatz StatWiSo2008.txt ins R ein und benennen Sie diesen
+mit Wiso. Schaffen Sie sich mit der Funktion head einen Uberblick ¨ uber die Daten. ¨
+
+
+```{r}
+statwiso = read.delim('Data/StatWiSo2008.txt', sep = "\t")
+statwiso
+```
+
+Aus wie vielen Zeilen besteht Wiso?
+
+```{r}
+summary(statwiso)
+```
+(b) Fugen Sie dem Data Frame die Variable ¨ BMI hinzu. Benutzen Sie dazu folgende
+Formel:
+BMI = K¨orpergewicht in kg
+(K¨orpergr¨osse in m)2
+
+```{r}
+statwiso = statwiso %>%
+  mutate(bmi = KGewicht / (KGroesse/100)^2)
+
+statwiso
+```
+
+(c) Welches Geschlecht hat die ¨alteste Person im Datensatz?
+
+```{r}
+statwiso %>%
+  select(Geschlecht, GebJahrgang, GebMonat) %>%
+  filter(GebJahrgang == min(GebJahrgang))
+```
+
+(d) Die Studierenden haben ihren Geburtsmonat und ihr Geburtsjahr angegeben. Leider fehlt uns aber der Geburtstag. Erzeugen Sie deshalb fur die folgenden Teil- ¨
+aufgaben pro Person einen hypothetischen Geburtstag. Da die Berechnung nicht
+vom Geburtsmonat abh¨angig sein soll, gehen wir davon aus, dass alle zwischen
+dem 1. und dem 28. Geburtstag haben. Berechnen Sie die neue Variable Tag als
+Wiso$KGroesse %% 28 + 1 und fugen Sie sie dem Data Frame hinzu. 
+
+```{r}
+statwiso = statwiso %>%
+  mutate(GebTag = KGroesse %% 28 +1 )
+
+statwiso
+```
+
+(e) Fugen Sie ¨ Wiso die Variable GebDatum hinzu, die das Geburtsdatum als Zeichenkette enth¨alt. Brauchen Sie dazu den Befehl paste.
+Ein Beispiel: 6.10.1987.
+
+```{r}
+statwiso = statwiso %>%
+  mutate(GebDatum = paste(GebTag, GebMonat, GebJahrgang, sep = "."))
+
+statwiso
+```
+Wandeln Sie GebDatum in ein Datums-Objekt um.
+
+```{r}
+library(lubridate)
+statwiso = statwiso %>%
+  mutate(GebDatum = with(statwiso, ymd(paste(GebJahrgang, GebMonat, GebTag, sep= ' '))))
+
+statwiso %>%
+  select(GebJahrgang, GebMonat, GebTag, GebDatum)
+```
+(g) Lassen Sie sich GebDatum im folgenden Format ausgeben:
+Wochentag (ausgeschrieben), Tag. Monatsname (ausg.) Jahr (zweistellig).
+Ein Beispiel: Freitag, 20. November 20.
+
+
+```{r}
+
+statwiso = statwiso %>%
+  mutate(GebTag_text = as.character(statwiso$GebDatum, format='%A, %d. %B %y'))
+
+statwiso %>%
+  select(GebJahrgang, GebMonat, GebTag, GebDatum, GebTag_text)
+```
+
+
+#  Aufgabe 4
+Lesen Sie den Datensatz florida.csv ins R ein und benennen Sie diesen mit florida
+
+```{r}
+florida = read.csv('Data/florida.csv', sep = ';')
+florida
+
+```
+
+
+
+
