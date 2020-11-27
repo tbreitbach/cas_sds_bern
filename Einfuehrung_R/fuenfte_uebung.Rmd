@@ -1,0 +1,166 @@
+---
+title: "fuenfte_uebung"
+author: "Tim Breitenbach"
+date: "27 11 2020"
+output: html_document
+---
+
+# Aufgabe 1 
+
+Erzeugen Sie einen Data Frame mit Namen Zufallszahlen, der 20 Beobachtungen
+enth¨alt und folgende Variablen umfasst:
+x: Normalverteilt mit Erwartungswert 100 und Standardabweichung 20.
+p: Uniformverteilt auf dem Intervall [0.2, 0.8].
+m: Poissonverteilt mit Erwartungswert 30.
+k: Ohne Zurucklegen gezogene Zufallszahlen aus der Menge ¨ {2, 4, 6, . . . , 100} (wie
+beim Urnenmodell).
+n: Binomialverteilt mit m Versuchen und Erfolgswahrscheinlichkeit p (m und p sind
+pro Beobachtung verschieden).
+
+
+
+```{r}
+n = 20
+Zufallszahlen = data.frame(
+  x = rnorm(n, 100, 20),
+  p = runif(n, 0.2, 0.8),
+  m = rpois(n, 30),
+  k = sample(seq(2, 100, 2), n)
+)
+
+Zufallszahlen$o = with(Zufallszahlen, rbinom(n, m, p))
+
+Zufallszahlen
+```
+
+
+#  Aufgabe 2
+
+(a) Erzeugen Sie einen Data Frame mit Namen Quantiles, bestehend aus der Variable
+p mit Werten 0.01, 0.02, . . . , 0.99 und der Variable z.p, welche die zu p zugeh¨origen
+Quantile der Standardnormalverteilung enth¨alt.
+Hinweis: Benutzen Sie zum L¨osen dieser Aufgabe die Funktion qnorm.
+
+```{r}
+quantiles = data.frame(p = seq(0.01, 0.99, 0.01))
+quantiles$zp = qnorm(quantiles$p)
+
+quantiles
+
+
+```
+
+
+(b) Erstellen Sie eine Matrix mit Namen Quantiles2 bestehend aus den Werten von
+Tabelle B.1 aus dem Skript zu den Modul 1. Insbesondere sollen die Werte auf
+drei Stellen gerundet werden. Des Weiteren sollen die Zeilen- und Spaltennamen
+(sinngem¨ass) denjenigen der Tabelle entsprechen.
+Hinweis: Benutzen Sie zum L¨osen dieser Aufgabe die Funktion outer.
+
+```{r}
+
+quantiles2 = round(qnorm(outer(seq(0, 0.9, 0.1), seq(0, 0.09, 0.01), "+")), 3)
+dimnames(quantiles2) = list(seq(0, 0.9, 0.1), seq(0, 0.09, 0.01))
+
+quantiles2
+
+```
+
+#  Aufgabe 3
+
+Fur diese Aufgabe verwenden wir den Datensatz ¨ iris.
+(a) Bestimmen Sie die mittlere L¨ange und Breite der Kelchbl¨atter (Sepal.Length
+bzw. Sepal.Width) fur ¨ setosa, versicolor und virginica.
+
+
+```{r}
+library(dplyr)
+
+tapply(iris$Sepal.Length, iris$Species, mean)
+  
+```
+(b) Erzeugen Sie eine Spearman-Korrelationsmatrix der vier Messungen Sepal.Length,
+Sepal.Width, Petal.Length und Petal.Width.
+
+
+```{r}
+cor(iris[, -5], method="spearman")
+```
+(c) Erzeugen Sie eine H¨aufigkeitstabelle der 3 Arten.
+```{r}
+
+table( iris$Species)
+```
+
+# Aufgabe 4
+
+Fur diese Aufgabe verwenden wir den Datensatz ¨ mtcars. Sie werden bemerken, dass
+gewisse Teilaufgaben bereits mit dem R Commander gel¨ost wurden. L¨osen Sie sie diesmal
+mit Hilfe von selbstgeschriebenem R-Code.
+(a) Sortieren Sie den Data Frame mtcars nach absteigenden Werten der Variable (hp).
+
+```{r}
+mtcars = mtcars[order(mtcars$hp, decreasing = TRUE),]
+
+mtcars
+
+```
+
+(b) Lassen Sie sich die Werte von (hp) ohne Duplikate anzeigen. Wieviele Eintr¨age hat
+dieser gekurzte Vektor?
+
+```{r}
+unique(mtcars$hp)
+
+length(unique(mtcars$hp))
+```
+(c) Berechnen Sie fur die Variable Hubraum ( ¨ disp) den Mittelwert, die Standardabweichung, den Median, die Quartile, das Minimum, das Maximum und den IQR.
+
+
+```{r}
+cat("Standardabweichung ist:", sd(mtcars$disp), "\n")
+cat("Mittelwert ist:", mean(mtcars$disp), "\n")
+cat("Median ist:", median(mtcars$disp), "\n")
+cat("Minimum ist:", min(mtcars$disp), "\n")
+cat("Maximum ist:", max(mtcars$disp), "\n")
+cat("Quantile sind (0, 0.25, 0.5, 0.75, 1): \n", quantile(mtcars$disp), "\n")
+cat("IQR ist:", IQR(mtcars$disp), "\n")
+```
+
+(d) Berechnen Sie noch einmal die Kennzahlen aus Teilaufgabe (a), diesmal jedoch
+getrennt nach der Variable Zylinderanzahl (cyl)
+
+```{r}
+aggregate(disp ~ cyl, mtcars, mean)
+aggregate(disp ~ cyl, mtcars, sd)
+aggregate(disp ~ cyl, mtcars, median)
+aggregate(disp ~ cyl, mtcars, min)
+aggregate(disp ~ cyl, mtcars, max)
+aggregate(disp ~ cyl, mtcars, quantile)
+aggregate(disp ~ cyl, mtcars, IQR)
+```
+
+(e) Stellen Sie die Variablen Zylinderanzahl und Anzahl Vorw¨artsg¨ange (gear) in einer
+Kreuztabelle dar.
+
+
+```{r}
+table(mtcars$gear, mtcars$cyl)
+```
+
+(f) Erstellen Sie eine Tabelle mit den absoluten, relativen und kumulierten relativen
+H¨aufigkeiten fur die Variable Vergaser ( ¨ carb). Achten Sie darauf, dass die Tabelle
+leicht verst¨andliche Spaltentitel hat.
+Gehen Sie beim Erstellen der Tabelle folgendermassen vor: Berechnen Sie die gefragten Kennzahlen mit Hilfe der Funktionen table und cumsum (schauen Sie sich
+dazu die Hilfeseite an) und fugen Sie die Kennzahlen zu einem Data Frame zu- ¨
+sammen
+
+
+```{r}
+vergaser = data.frame(table(mtcars$carb))
+names(vergaser) = c("Vergaser", "abs_Haeuf")
+vergaser$rel_Haeuf = vergaser$abs_Haeuf/sum(vergaser$abs_Haeuf)
+vergaser$kum_Haeuf = cumsum(vergaser$rel_Haeuf)
+vergaser
+```
+
