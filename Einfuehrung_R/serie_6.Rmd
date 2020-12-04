@@ -1,0 +1,223 @@
+---
+title: "Serie_6"
+author: "Tim Breitenbach"
+date: "4 12 2020"
+output: html_document
+---
+
+# Aufgabe 1
+Fur diese Aufgabe verwenden wir nochmals den Datensatz ¨ mtcars.
+(a) Erstellen Sie fur die Variable Hubraum ein Histogramm mit Klassengrenzen 50 ¨ , 75,
+100, . . . , 475. Der Darstellungsbereich der x-Achse soll zwischen 0 und 500 liegen
+und die Fullfarbe der Balken gr ¨ un ( ¨ green) sein. Beschriften Sie abschliessend die
+Grafik mit ”
+Histogramm Hubraum“ und die x-Achse mit ”
+Hubraum“.
+
+```{r}
+library(ggplot2)
+
+qplot(mtcars$disp,
+      geom = "histogram",
+      main = "Histogramm Hubraum",
+      xlim = c(0, 500),
+      fill=I("green"),
+      col=I("black"),
+      binwidth = 25,
+      xlab = "Hubraum")
+```
+
+
+(b) Stellen Sie mit Hilfe eines Stabdiagramms dar, wie oft die verschiedenen Werte
+der Variable Vergaser (carb) vorkommen.
+
+```{r}
+table(mtcars$carb)
+
+barplot(table(mtcars$carb))
+```
+
+(c) Zeichnen Sie die empirische Verteilung der Variable Vergaser (carb) (also die Treppenfunktion der kumulierten relativen H¨aufigkeiten aus Serie 5, Aufgabe 4 (f)).
+Hinweis: Fur eine sinnvolle Darstellung m ¨ ussen Sie die Anzahl der Vergaser als ¨
+numerische Variable verwenden.
+Fugen Sie die kumulierten relativen H ¨ ¨aufigkeiten als ausgefullte ( ¨ pch=16) rote
+(red) Punkte hinzu.
+
+```{r}
+library(dplyr)
+
+Tabelle = data.frame(table(mtcars$carb))
+
+names(Tabelle) = c("Vergaser", "abs.Haufig")
+
+Tabelle = Tabelle %>%
+  mutate(rel_Haufig = abs.Haufig/sum(abs.Haufig)) %>%
+  mutate(kum_Haufig = cumsum(rel_Haufig)) %>%
+  mutate(Vergaser = as.numeric(levels(Vergaser)[Vergaser]))
+
+Tabelle
+
+plot(Tabelle$Vergaser, Tabelle$kum_Haufig, type="s", ylab="kumulierte Häufigkeit", xlab="Vergaser")
+points(Tabelle$Vergaser, Tabelle$kum_Haufig, col="red", pch=16)
+
+
+```
+
+(d) Interpretieren Sie den folgenden R-Code bzw. skizzieren Sie das Ergebnis:
+pie(table(mtcars$gear), labels=c(’3 Gears’,’4 Gears’,’5 Gears’),
+col=c(’white’,’grey’,’black’),
+main=’Pie Chart of Gear Distribution’)
+(Die sortierten Werte von mtcars$gear sind: 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5.)
+Uberpr ¨ ufen Sie Ihr Ergebnis, indem Sie den Code in R ausf ¨ uhren. 
+
+Ein Kuchendiagramm bei den 3 Gänge weiss sind, 4 Gänge grau und fünf Gänge schwarz. Beschriftet ist das ganze mit Pie Chart of Gear Distribution 
+```{r}
+pie(table(mtcars$gear), labels=c('3 Gears','’4 Gears’','’5 Gears’'),
+col=c('white','grey','black'),
+main='Pie Chart of Gear Distribution')
+
+```
+
+# Aufgabe 2
+
+Fur diese Aufgabe verwenden wir den Datensatz ¨ CO2 aus dem Paket datasets. Versuchen Sie, den folgenden Plot zu reproduzieren.
+
+
+```{r}
+Mis_chill = CO2 %>%
+  filter(Type == "Mississippi") %>%
+  filter(Treatment == "chilled")
+  
+Mis_nonchill = CO2 %>%
+  filter(Type == "Mississippi") %>%
+  filter(Treatment == "nonchilled")
+
+Que_chill = CO2 %>%
+  filter(Type == "Quebec") %>%
+  filter(Treatment == "chilled")
+
+Que_nonchill = CO2 %>%
+  filter(Type == "Quebec") %>%
+  filter(Treatment == "nonchilled")
+
+par(mfrow=c(2,1))
+
+plot(Mis_nonchill$conc, Mis_nonchill$uptake, 
+     col="red",
+     main="Mississippi",
+     xlab= "Concentration",
+     ylab="Uptake",
+     ylim = c(-30,50))
+points(Mis_chill$conc, Mis_chill$uptake, col ="orange")
+legend("bottomright",
+       legend = c("nonchilled", "chilled"),
+       pch = 1,
+       col = c("red", "orange"))
+
+
+plot(Que_nonchill$conc, Que_nonchill$uptake, 
+     col="blue",
+     main="Quebec",
+     xlab= "Concentration",
+     ylab="Uptake",
+     ylim = c(-30,50))
+points(Que_chill$conc, Que_chill$uptake, col ="purple")
+legend("bottomright",
+       legend = c("nonchilled", "chilled"),
+       pch = 1,
+       col = c("blue", "purple"))
+
+```
+# Aufgabe 3
+
+In dieser Aufgabe geht es um Analysen von Bodenproben, die in der N¨ahe des Mount
+Kenya genommen worden sind.
+(a) Importieren Sie die Daten aus der Datei soils.txt.
+
+```{r}
+soils = read.delim("Data/soils.txt", sep = "\t")
+summary(soils)
+```
+
+(b) Wieso wurde die Variable Exch.Ca (wie auch Exch.Mg und Exch.Na) als character und nicht als numerische Variable importiert?
+
+```{r}
+soils$Exch.Ca
+```
+In der Spalte sind Wörter wie "Trace"
+
+(c) Die Variablen Longitude und Latitude enthalten die geographischen Koordinaten der Punkte, an denen die Proben genommen wurden. Stellen Sie die beiden
+Variablen in einem Streudiagramm dar.
+
+```{r}
+with(soils, plot(Longitude, Latitude))
+```
+
+(d) Erstellen Sie noch einmal ein Streudiagramm wie in (c). Diesmal sollen aber die
+unterschiedlichen Klassen des geologischen Untergrunds (Variable Geology mit
+Werten 1 bis 6) durch unterschiedliche Farben gekennzeichnet werden. Zudem soll
+die Grafik eine Legende enthalten.
+Wie k¨onnte man diese Darstellung von Geology optimieren?
+
+```{r}
+with(soils, 
+     plot(Longitude, Latitude, col=Geology))
+legend("bottomright",
+       pch = 1,
+       col = 1:6,
+       legend = as.character(1:6))
+```
+
+
+(e) Die Variablen Sand, Silt und Clay geben die Zusammensetzung des Bodens an
+(Anteile in %). Stellen Sie Sand und Silt in einem Streudiagramm dar. Dabei
+sollen beide Achsen den Bereich von 0 bis 100 umfassen. Zeichnen Sie jetzt noch
+das Dreieck aus den Geraden mit Sand=0, Silt=0 bzw. Sand+Silt=100 in die
+Grafik ein. (In diesem Bereich mussen die Punkte liegen). ¨
+
+```{r}
+with(soils, plot(Sand, Silt, 
+                 xlim=c(0,100),
+                 ylim=c(0,100)))
+polygon(c(0, 100, 0), c(0, 0 , 100))
+```
+
+(f) Erstellen Sie eine Scatterplotmatrix fur die Variablen ¨ Sand, Silt und Clay, in
+welcher der geologische Untergrund farblich gekennzeichnet ist.
+
+```{r}
+pairs(soils[, c("Sand", "Silt", "Clay")], col=soils$Geology)
+```
+
+(g) Erstellen Sie einen 3D-Plot fur die Variablen ¨ Sand, Silt und Clay. Was f¨allt Ihnen
+beim Drehen auf?
+
+```{r}
+library(rgl)
+with(soils, plot3d(Sand, Silt, Clay))
+```
+ Einige Ausreisser.
+
+(h) Zeichnen Sie einen Boxplot des Anteils an organischem Material (Organic.Matter)
+in Abh¨angigkeit vom geologischen Untergrund und beschriften Sie die Achsen sinnvoll.
+
+```{r}
+ boxplot(Organic.Matter ~ Geology, 
+         data = soils, 
+         xlab = "Geology",
+         ylab = "Organic Matter")
+
+```
+
+(i) Zeichnen Sie ein Histogramm der Variablen Organic.Matter mit ca. 40 Klassen
+und grauen Balken. Erstellen Sie zudem einen Normal-QQ-Plot dieser Variablen.
+Was k¨onnen Sie uber die Verteilung aussagen? 
+
+```{r}
+with(soils, hist(Organic.Matter,
+                 breaks = 40,
+                 col = "grey"))
+qqnorm(soils$Organic.Matter)
+```
+Rechtsschief

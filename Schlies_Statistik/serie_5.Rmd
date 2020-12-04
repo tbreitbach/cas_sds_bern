@@ -1,0 +1,95 @@
+---
+title: "Serie_5"
+author: "Tim Breitenbach"
+date: "4 12 2020"
+output: html_document
+---
+
+# Aufgabe 1
+In der Berner Studentenkneipe Finkenkrug sollen geeichte Biergl¨aser im Ausschank 0.4
+Liter Bier enthalten. Bei einer Kontrolle einer Berner Studentenverbindung vom Umfang n = 200 ergab sich eine durchschnittliche Fullmenge ¨ X¯ = 0.385 Liter bei einer
+empirischen Standardabweichung von sd(X1, . . . , X200) = 0.113 Litern. Sie als Statistiker der Studentenverbindung haben nun den Auftrag herauszufinden, ob die tats¨achliche
+Fullmenge mit der Vorgabe ¨ ubereinstimmt, oder ob eher zu knausrig ausgeschenkt wird. ¨
+Das Signifikanzniveau sei 5%.
+Beantworten Sie folgende Fragen:
+
+(a) Entscheiden Sie sich fur einen einseitigen oder zweiseitigen Test? Begr ¨ unden Sie ¨
+in einem Satz.
+
+Einseitige Test da sich niemand beschwert wenn zu viel Bier im Glas ist.
+
+(b) Wie lauten die Null- und Arbeitshypothese?
+
+H0 : Mü >= Mü0 = 0,4 Liter
+H1 : Mü < 0,4 Liter
+
+(c) Welchen Test verwenden Sie?
+
+n ist sehr gross daher wird der z-Test verwendet.
+
+
+(d) Wie ist die Teststatistik definiert und welchen Wert nimmt sie konkret an?
+
+Z=Wurzel n * ((Mittelwert - Mü0)/(sd(x1 bis x200)) = -1,875
+
+
+(e) Beschreiben Sie den kritischen Bereich zum gegebenen Signifikanzniveau α.
+
+(f) Beschreiben Sie den Ausgang des Tests in einem Satz.
+
+Mit einer Wahrscheinlichkeit von 95% wird in der Gaststätte zu wenig Bier ausgeschenkt.
+
+(g) Beschreiben Sie in 2–3 S¨atzen, was sich an unserem Testdesign ¨andern wurde, ¨
+wenn wir bloss n = 20 Gl¨aser kontrollierten.
+
+Der z-Test darf nicht benutzt werden. Da wir keine Verteilungsdetails kennen fällt der t-Test auch weg.
+WVR-Test macht Sinn, da beim ausschenken wahrscheinlich teilweise zu viel ausgeschenkt wird und manchmal zu wenig.
+
+# Aufgabe 2
+
+Anhand einer Stichprobe soll uberpr ¨ uft werden, ob eine Abf ¨ ullmaschine f ¨ ur Weinflaschen ¨
+im Mittel weniger als 750 ml Wein pro Flasche abfullt. ¨
+(a) Wie muss ein Kunde die Hypothesen w¨ahlen, um dem Abfuller nachzuweisen, dass ¨
+im Mittel weniger als 750 ml pro Flasche eingefullt werden? Was kann man unter ¨
+dem Konsumenten- und dem Produzentenrisiko verstehen?
+
+H0: Mü >= 750ml
+H1: Mü < 750 ml
+
+Kundenrisiko ist die Wahrscheinlichkeit für Fehler 2er Art.
+Produzentenrisiko ist die Wahrscheinlichkeit für Fehler 1er Art.
+
+(b) Ein Kunde hat den Inhalt von 36 Flaschen gemessen und erhielt folgende Daten:
+Weinabfullmengen [in ml] ¨
+750.9 749.8 750.6 751.5 748.0 750.4 747.6 752.6
+750.5 751.3 749.1 758.1 743.2 748.7 749.3 747.8
+735.9 750.4 746.5 748.7 749.2 749.2 750.6 754.9
+749.1 750.9 754.7 751.5 751.2 750.4 750.5 748.2
+749.0 749.1 744.7 747.2
+Testen Sie die unter (a) spezifizierten Hypothesen mit einem geeigneten Test. Das
+Signifikanzniveau sei α = 0.05.
+
+Da n=36 wird t-Test, Wilcoxon-Test und Vorzeichen Test Sinn ergeben.
+Bei t-Test muss geschaut werden ob Daten normalverteilt --> QQ-Plot
+Bei Wilcoxon-Test muss geschaut werden ob Daten symetrisch --> Boxplot
+Ansonsten Vorzeichen Test.
+
+```{r}
+library(exactRankTests)
+ wein <- c(750.9, 749.8, 750.6, 751.5, 748.0, 750.4, 747.6, 
+ 752.6, 750.5, 751.3, 749.1, 758.1, 743.2, 748.7, 749.3, 747.8, 
+ 735.9, 750.4, 746.5, 748.7, 749.2, 749.2, 750.6, 754.9, 749.1, 
+ 750.9, 754.7, 751.5, 751.2, 750.4, 750.5, 748.2, 749.0, 749.1, 
+ 744.7, 747.2)
+
+qqnorm(wein)
+
+boxplot(wein)
+
+wilcox.test(wein, alternative="less", mu=750)
+
+wilcox.exact(wein, alternative="less", mu=750)
+
+```
+Die Nullhypothese kann also nicht verworfen werden.
+
