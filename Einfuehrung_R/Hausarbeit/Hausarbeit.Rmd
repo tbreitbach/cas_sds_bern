@@ -1,0 +1,141 @@
+---
+title: "Hausarbeit"
+author: "Tim Breitenbach"
+date: "22 1 2021"
+output: pdf_document
+---
+
+# Die Datei spinnen.csv enthaelt Daten zu Spinnen, die im Rahmen eines 
+# Forschungsprojekts in einem Auengebiet in den Fallen vorgefunden wurden, 
+# welche an 47 verschiedenen Standorten platziert worden waren. Die Fallen 
+# wurden normalerweise monatlich kontrolliert und geleert, es konnten aber 
+# nicht immer alle Fallenstandorte besucht werden.
+# Besten Dank an Sarah Rohr fuer die Erlaubnis, ihre (minimal veraenderten)
+# Daten im Rahmen des Statistik-Unterrichts zu verwenden. Bitte die Daten 
+# nicht anderweitig weiterverwenden oder weitergeben.
+
+
+
+#########################################################
+#### Aufgabe 1: Import, Datenaufbereitung (8 Punkte) ####
+#########################################################
+
+
+#### 1 (a) (1 Punkt) ####
+ 
+Importieren Sie die Datei als Data Frame "spinnen" ins R. Die einzelnen 
+Variablen in der Datei sind mit Strichpunkten voneinander getrennt.
+
+
+
+```{r data reading, include=TRUE}
+
+spinnen <- read.csv("spinnen.csv", sep = ";")
+```
+
+#### 1 (b) (1 Punkt) ####
+Verschaffen Sie sich einen Ueberblick ueber die vorhandenen Variablen.
+Welche eigentlich numerischen Variablen sollte man bearbeiten, bevor man 
+sie verwendet, da sie nicht als Zahlen importiert wurden?
+Weshalb wurden diese Variablen nicht wie gewuenscht importiert?
+
+Zu bearbeitende Columns:
+- ycoor teilweise sind Leerschläge in den Zahlen, an welchen R sie als character anstatt als numerische Variable erkennen lässt
+- date wird als Character eingelesen, sieht inital aus als wäre irgendetwas nicht richtig, ist aber eigentlich eine Daterange. Es muss also nichts verändert werden
+- Alle Mean Variablen werden als Character eingelesen, da sie Komma anstatt einen Punkt als Dezimaltrennzeichen verwenden(Standard ist Punkt und es wird auch Punkt in voherigen Variablen benutzt)
+
+```{r summary and col transformation}
+spinnen
+summary(spinnen)
+str(spinnen)
+
+```
+#### 1 (c) (3 Punkte*) ####
+# Wie kann man diese Variablen in die gewuenschten numerischen Werte 
+# umwandeln?
+# Hinweis: Die Funktion gsub ist dafuer nuetzlich - sie ermoeglicht es, in 
+#          einem character-Vektor gewisse Zeichenfolgen durch andere zu 
+#          ersetzen. Die Verwendung wird in der R-Hilfe (?gsub) erlaeutert. 
+#          Die wesentlichen Parameter sind pattern, replacement und x; wenn 
+#          Sie den Parameter fixed auf TRUE setzen, brauchen Sie sich 
+#          ausserdem nicht mit "regular expressions" zu befassen. Einfachere 
+#          Beispiele zur Anwendung finden Sie unter 
+#          http://rfunction.com/archives/2354 oder im Code zur Vorlesung vom 
+#          20.11.2020.
+# Natuerlich sind auch Loesungen ohne gsub erlaubt. Sie duerfen auch die 
+# Daten in anderer Form neu importieren - wichtig ist einfach, dass am Ende 
+# der Data Frame spinnen alle numerischen Variablen tatsaechlich als 
+# "numeric" (oder bei ganzzahligen Werten evtl. "integer") enthaelt.
+
+...
+```{r}
+library(dplyr)
+library(stringr)
+spinnen <- spinnen %>%
+  mutate(ycoor = as.numeric(str_remove(ycoor, " "))) %>%
+  mutate(mean_t = as.numeric(str_replace(mean_t, ",", "."))) %>%
+  mutate(mean_k = as.numeric(str_replace(mean_k, ",", "."))) %>%
+  mutate(mean_l = as.numeric(str_replace(mean_l, ",", "."))) %>%
+  mutate(mean_f = as.numeric(str_replace(mean_f, ",", "."))) %>%
+  mutate(mean_r = as.numeric(str_replace(mean_r, ",", "."))) %>%
+  mutate(mean_n = as.numeric(str_replace(mean_n, ",", "."))) %>%
+  mutate(mean_w = as.numeric(str_replace(mean_w, ",", "."))) %>%
+  mutate(mean_h = as.numeric(str_replace(mean_h, ",", "."))) %>%
+  mutate(mean_d = as.numeric(str_replace(mean_d, ",", ".")))
+
+str(spinnen)
+summary(spinnen$ycoor)
+```
+
+
+# Falls Sie einen Teil der obenstehenden Aufgaben nicht loesen konnten, 
+# koennen Sie die soweit aufbereiteten Daten auch direkt aus der Datei 
+# spinnen_h1.txt importieren: 
+# spinnen <- read.delim('spinnen_h1.txt')
+
+
+#### 1 (d) (1 Punkt) ####
+Entfernen Sie alle Zeilen, bei denen die Angabe zu tot_individuals NA ist, 
+aus dem Data Frame spinnen.
+(Dies sind Eintraege zu Fallen, die zum entsprechenden Zeitpunkt nicht 
+besucht werden konnten.)
+
+
+```{r}
+spinnen <- spinnen %>%
+  filter(!is.na(tot_individuals))
+
+summary(spinnen$tot_individuals)
+```
+#### 1 (e) (1 Punkt) ####
+# Welche Werte kommen in der Variable month vor, und wie oft?
+
+```{r}
+summary(as.factor(spinnen$month))
+```
+
+#### 1 (f) (1 Punkt) ####
+# Erzeugen Sie aus der Variable month eine neue Faktor-Variable month2 im 
+# Data Frame spinnen. Die Levels dieses Faktors ("Monatsnamen") sollen 
+# sinnvoll geordnet sind.
+# (Hinweis: "Dez" bezieht sich auf den Dezember 2018, alle anderen Eintraege 
+# aufs Jahr 2019.)
+# Lassen Sie sich nun mit dieser Variable nochmals die Haeufigkeiten anzeigen.
+
+```{r}
+spinnen <- spinnen %>%
+  mutate(month2 = ordered(as.factor(month), levels = c("Dez", "Jan-Feb", "Mrz", "Apr", "Mai", "Jun", "Jun-Jul","Jul", "Jun-Aug", "Aug", "Sept", "Okt", "Nov")))
+
+summary(spinnen$month2)
+           
+```
+
+###################################################################
+#### Aufgabe 2: Analysen mit dem Data Frame spinnen (6 Punkte) ####
+###################################################################
+
+
+#### 2 (a) (1 Punkt) ####
+Erzeugen Sie eine Kreuztabelle: Welche Falle (Variable trapnum) kommt in 
+welchem "Monat" (Variable month2) wie oft im Data Frame spinnen vor?
+
