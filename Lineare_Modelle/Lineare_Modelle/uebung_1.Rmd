@@ -1,0 +1,190 @@
+---
+title: "uebung_1"
+author: "Tim Breitenbach"
+date: "26 2 2021"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Aufgabe 1 
+
+Ziel dieser Aufgabe ist es, den Zusammenhang einer kategoriellen und
+einer numerischen Variable zu beschreiben. Dazu betrachten wir den
+Datensatz Caffeine.txt. Er enthalt das Resultat einer Studie, die den
+Ein uss von Koein auf die Tippgeschwindigkeit untersuchen sollte. Dabei
+wurde 30 mannlichen Collegestudenten das Schreibmaschinenschreiben
+beigebracht. Danach wurden sie zufallig in drei gleich grosse Gruppen
+aufgeteilt und erhielten verschiedene Dosen Koein (0, 100 und 200 mg).
+Zwei Stunden spater musste jeder Proband tippen und die Anzahl
+Anschlage pro Minute wurde aufgezeichnet.
+
+```{r}
+fingertips = read.delim('./data/Caffeine.txt', sep = "\t")
+fingertips
+```
+
+(a) Wie gross sind die Mittelwerte von fingertaps pro Gruppe?
+    Beschreiben Sie damit den Zusammenhang zwischen fingertaps und
+    Koeindosis.
+
+```{r, warning=FALSE}
+library(Hmisc)
+summary(fingertips$fingertaps ~ fingertips$dose)
+```
+
+(b) Erstellen Sie pro Gruppe einen Boxplot für fingertaps. Konnen Sie
+    damit die Beurteilung aus Teil a) bestatigen?
+
+```{r, warning=FALSE}
+boxplot(fingertips$fingertaps ~ fingertips$dose)
+```
+
+(c) Fuhren Sie nun eine entsprechende ANOVA durch. Wie hoch ist das
+    Bestimmtheitsmass? Was konnen Sie damit kurz uber die Varianz von
+    \`ngertabs' sagen?
+
+```{r}
+fit = lm(fingertaps ~ dose, data = fingertips)
+summary(fit)
+```
+
+(d) Bestimmen Sie die Varianz der Residuen und jene von fingertaps.
+    Berechnen Sie daraus das R2 von Hand.
+
+```{r}
+var(resid(fit))
+
+var(fingertips$fingertaps)
+
+1-(var(resid(fit))/var(fingertips$fingertaps))
+```
+
+# Aufgabe 2
+
+Fassen wir nun die Daten aus Aufgabe 1 als Zufallsstichprobe aus der
+Population aller
+
+Collegestudenten auf.
+
+(a) In welchen Bereichen liegen die tatsächlichen Gruppenmittelwerte i,
+i = 1; 2; 3,
+
+mit je etwa 95% Sicherheit?
+
+```{r}
+by(fingertips$fingertaps, fingertips$dose, t.test)
+```
+
+(b) Formulieren Sie Arbeits- und Nullhypothesen des F-Tests hinsichtlich
+der i.
+
+H0: Alle tatsächlichen Mittelwerte sind gleich
+
+H1: Nicht alle tatsächlichen Mittelwerte sind gleich
+
+(c) Formulieren Sie die Hypothesen nun auch noch hinsichlich des
+wirklichen Bestimmtheitsmasses
+
+.
+
+H0: R\^2 in der Population ist null
+
+H1: R\^2 in der Population ist grösser als null
+
+(d) Konnen Sie die Nullhypothese(n) auf dem 5%-Niveau verwerfen? Was
+bedeutet
+
+dies fur den Zusammenhang zwischen fingertaps und Koeindosis?
+
+```{r}
+summary(lm(fingertaps ~ dose, data=fingertips))
+```
+
+(e) Bestimmen sie TSS und RSS. Berechnen Sie damit die F-Teststatistik.
+Wie ndet
+
+man daraus den p-Wert?
+
+```{r}
+TSS = sum((fingertips$fingertaps - mean(fingertips$fingertaps))^2)
+RSS = sum(residuals(fit)^2)
+test = (TSS-RSS)/2 / (RSS - 27)
+pval = 1-pf(test, 2, 27)
+```
+
+(f) Trauen Sie dem p-Wert des F-Tests? Beantworten Sie diese Frage
+mithilfe deskriptiver
+
+Uberlegungen.
+
+```{r}
+lapply(split(fingertips$fingertaps, fingertips$dose), sd)
+```
+
+Stichprobenumfang eher klein, deshalb vorsicht.
+
+(g) Eine wichtige Voraussetzung des F-Tests ist die gleiche Streuung
+zwischen den
+
+Gruppen. Angenommen, ein Test der Nullhypothese \\Alle Varianzen sind
+gleich"
+
+(z. B. Levenes Test) ergibt einen p-Wert von 0:3. Weshalb hilft uns das
+nicht zur
+
+Beurteilung der Voraussetzung?
+
+Negativer Testentscheid folgt nicht dass die Nullhypothese stimmt.
+
+(h) Was konnen Sie anhand des p-Werts aus d) uber die untere
+95%-Kondenzschranke
+
+fur  sagen?
+
+Untere 95% Konfidenzschranke muss grösser als Null sein.
+
+(i) Prufen Sie nun auf zwei Arten \\post-hoc", zwischen welchen der
+drei Gruppen
+
+wirklich ein mittlerer Unterschied besteht: Einerseits ohne Korrektur
+fur multiples
+
+Testen (5%-Niveau pro Test), andererseits mit Bonferroni-Holm-Korrektur
+(insgesamt
+
+5%-Niveau). Uberlegen Sie, wie Sie die p-Werte nach der
+Bonferroni-Holm-
+
+Korrektur aus den p-Werten ohne Korrektur erhalten.
+
+
+```{r}
+pairwise.t.test(fingertips$fingertaps, fingertips$dose, p.adjust.method = "none")
+pairwise.t.test(fingertips$fingertaps, fingertips$dose, p.adjust.method = "holm")
+```
+
+Aufgabe 3
+Hier wollen wir sehen, dass die F-Teststatistik der Einweg-ANOVA als Funktion des R2
+geschrieben werden kann. Dabei verwenden wir die Notation aus dem Vorlesungsskript.
+(a) Zeigen Sie, dass
+R2 = TSS - RSS / TSS
+und 1 􀀀 R2 =
+RSS
+TSS
+:
+
+R^2 = 1 - (Var(e)/Var(Y)) = 1 - (Var(e)*(n-1)/Var(y)*(n-1)) = 1 - RSS/TSS
+
+(b) Verwenden Sie die Formeln aus (a), um zu zeigen, dass die F-Teststatistik T folgende
+alternative Formel hat:
+T =
+R2
+1 􀀀 R2
+n 􀀀 p
+p 􀀀 1
+:
+(c) Uberlegen Sie anhand dieser Formel, in welchen Situationen besonders viel gegen
+die Nullhypothese von keinem Zusammenhang spricht.
+(d) Verizieren Sie die Formel aus (b) mit dem Datensatz aus Aufgabe 1.
